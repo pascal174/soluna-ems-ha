@@ -1,0 +1,31 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Soluna EMS",
+        "description": "Vul het adres van je Soluna EMS in. Een token is alleen nodig als je er in de EMS-instellingen een hebt ingesteld.",
+        "data": {
+          "host": "IP-adres of hostnaam",
+          "port": "Poort",
+          "token": "API-token (optioneel)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Geen verbinding met de EMS. Klopt het IP-adres en draait de EMS?",
+      "invalid_auth": "Het token werd geweigerd.",
+      "unknown": "Onverwachte fout."
+    },
+    "abort": {
+      "already_configured": "Deze EMS is al toegevoegd."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Instellingen",
+        "data": { "scan_interval": "Ophaalinterval (seconden)" }
+      }
+    }
+  }
+}
