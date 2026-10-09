@@ -29,6 +29,7 @@ class SolunaCoordinator(DataUpdateCoordinator):
         self._url = f"http://{host}:{port}/api/ha/state"
         self._headers = {"Authorization": f"Bearer {token}"} if token else {}
         self.host = host
+        self.port = port
         super().__init__(
             hass,
             _LOGGER,
