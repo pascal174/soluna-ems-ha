@@ -1,7 +1,8 @@
 # Soluna EMS — Home Assistant integratie
 
-Leest je [Soluna EMS](https://github.com/pascal174/solana) uit in Home Assistant. **Alleen lezen**: de
-integratie kan niets aan je installatie veranderen. Er zitten geen schakelaars, knoppen of services in.
+Leest je [Soluna EMS](https://github.com/pascal174/solana) uit in Home Assistant, en kan hem bedienen
+als je dat toestaat. **Standaard alleen lezen**: bedienen zet je zelf aan in de opties (zie
+[Bedienen](#bedienen)).
 
 ## Wat je krijgt
 
@@ -28,6 +29,35 @@ gasaansluiting of laadpaal verschijnen die dus niet — geen rijtje sensoren op 
 
 > Voor alles wat met *(1.1.0)* is gemarkeerd is **Soluna EMS 2.1.55 of nieuwer** nodig. Met een oudere
 > EMS werkt de integratie gewoon, alleen verschijnen die entiteiten dan niet.
+
+## Bedienen
+
+*(1.2.0, vereist Soluna EMS 2.1.59 of nieuwer)*
+
+Standaard staat bedienen **uit**: dan bestaan de bedien-entiteiten niet, en kan een automatisering of
+een misklik op het dashboard niets aan je installatie veranderen. Aanzetten: Instellingen → Apparaten &
+diensten → *Soluna EMS* → **Configureren** → **Bediening toestaan**. Uitzetten haalt ze weer weg.
+
+| Groep | Entiteit | Wat het doet |
+|---|---|---|
+| **Laadpaal** | *Laadvermogen* (schuif, kW) | Handmatig laadvermogen; 0 = pauzeren. Zet slim laden uit, net als op het dashboard. Op een 3-fase laadpaal is ±4,1 kW het minimum (6 A per fase); daaronder pauzeert hij. |
+| | *Laden stoppen* (knop) | Pauzeert het laden en zet slim laden uit. |
+| | *Overschot-laden* (schakelaar) | Laden op zonne-overschot aan/uit. |
+| **Slim laden** | *Slim laden* (schakelaar) | Aan met de instellingen hieronder; uit stopt ook het laden. |
+| | *Slim laden: hoeveel* (kWh), *laadvermogen* (kW), *klaar om* (tijd) | De instellingen. Bijstellen tijdens een sessie houdt de voortgang vast: van 30 naar 35 kWh betekent er nog 5 bij, niet 35 opnieuw. |
+| **EMS-sturing** | *Regelmodus* | Automatisch (de optimizer stuurt) of handmatig. Terug naar automatisch wist een vaste accu-opdracht of geforceerde strategie. |
+| | *Handmatige strategie* | Een strategie forceren (balanceren, opladen, ontladen, alleen injectie, piekscheren); zet de modus op handmatig. |
+| | *Optimizer* | Regels of AI. |
+| **Thuisaccu** | *Accu-opdracht* | Stil, laden of ontladen met een vast vermogen; zet de modus op handmatig. |
+| | *Accu-vermogen* (schuif, W) | Het vermogen voor die opdracht. Loopt er een laad- of ontlaadopdracht, dan gaat een nieuw vermogen meteen mee. |
+
+Alle acties gaan naar `POST /api/ha/control` op de EMS en lopen daar via **hetzelfde endpoint als een
+klik op het EMS-dashboard**. De grenzen worden dus door de EMS bewaakt, niet door deze integratie: het
+maximum van de laadpaal, de SoC-grenzen en maximale vermogens van de accu, de zekeringbeveiliging, het
+beslissingslogboek. Weigert de EMS iets, dan krijg je in Home Assistant een foutmelding met de reden.
+
+Wat er bewust níet bij zit: iets wat de auto wekt of uitleest, en het wijzigen van apparaten of andere
+instellingen van de EMS.
 
 ## De auto wordt nooit gewekt
 

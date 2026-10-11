@@ -1,5 +1,21 @@
 # Changelog — Soluna EMS Home Assistant-integratie
 
+## 1.2.0 — 2026-10-11
+
+Vereist voor het bedienen: **Soluna EMS 2.1.59 of nieuwer**. Uitlezen werkt met elke EMS-versie zoals
+voorheen.
+
+- **Bedienen vanuit Home Assistant, standaard uit.** Nieuwe optie *Bediening toestaan*. Staat die uit,
+  dan worden de bedien-entiteiten niet aangemaakt; uitzetten haalt ze weer weg.
+- **Laadpaal**: schuif *Laadvermogen*, knop *Laden stoppen*, schakelaar *Overschot-laden*.
+- **Slim laden**: schakelaar, en *hoeveel* (kWh), *laadvermogen* (kW) en *klaar om* (tijd). Bijstellen
+  tijdens een sessie houdt de voortgang vast.
+- **EMS-sturing**: keuzelijsten *Regelmodus*, *Handmatige strategie* en *Optimizer*.
+- **Thuisaccu**: keuzelijst *Accu-opdracht* (stil/laden/ontladen) en schuif *Accu-vermogen*.
+- Alles loopt via de EMS (`POST /api/ha/control`) en dezelfde controles als het dashboard. Een
+  geweigerde actie wordt een foutmelding met de reden, in plaats van een schakelaar die stilletjes
+  terugspringt. Niets wekt de auto.
+
 ## 1.1.0 — 2026-10-09
 
 Vereist voor de nieuwe entiteiten: **Soluna EMS 2.1.55 of nieuwer**. Met een oudere EMS werkt deze

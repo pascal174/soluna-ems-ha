@@ -9,7 +9,7 @@ from homeassistant.const import CONF_HOST, CONF_PORT, CONF_SCAN_INTERVAL
 from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .const import CONF_TOKEN, DEFAULT_PORT, DEFAULT_SCAN_INTERVAL, DOMAIN
+from .const import CONF_BEDIENING, CONF_TOKEN, DEFAULT_PORT, DEFAULT_SCAN_INTERVAL, DOMAIN
 
 
 async def _controleer(hass, host: str, port: int, token: str) -> dict:
@@ -64,7 +64,7 @@ class SolunaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
 
 class SolunaOptionsFlow(config_entries.OptionsFlow):
-    """Alleen het pollinterval is achteraf instelbaar."""
+    """Achteraf instelbaar: het pollinterval en of Home Assistant mag bedienen."""
 
     def __init__(self, config_entry) -> None:
         self.config_entry = config_entry
@@ -73,8 +73,10 @@ class SolunaOptionsFlow(config_entries.OptionsFlow):
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
         huidig = self.config_entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+        bedienen = self.config_entry.options.get(CONF_BEDIENING, False)
         schema = vol.Schema({
             vol.Optional(CONF_SCAN_INTERVAL, default=huidig): vol.All(int, vol.Range(min=5, max=300)),
+            vol.Optional(CONF_BEDIENING, default=bedienen): bool,
         })
         return self.async_show_form(step_id="init", data_schema=schema)
 

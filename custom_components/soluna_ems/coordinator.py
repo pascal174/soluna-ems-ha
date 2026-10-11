@@ -12,6 +12,7 @@ from datetime import timedelta
 import aiohttp
 import async_timeout
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
@@ -27,6 +28,7 @@ class SolunaCoordinator(DataUpdateCoordinator):
                  scan_interval: int) -> None:
         self._session = async_get_clientsession(hass)
         self._url = f"http://{host}:{port}/api/ha/state"
+        self._bedien_url = f"http://{host}:{port}/api/ha/control"
         self._headers = {"Authorization": f"Bearer {token}"} if token else {}
         self.host = host
         self.port = port
@@ -51,6 +53,38 @@ class SolunaCoordinator(DataUpdateCoordinator):
                 return await resp.json()
         except aiohttp.ClientError as err:
             raise UpdateFailed(f"Geen verbinding met de EMS: {err}") from err
+
+    async def stuur(self, actie: str, **gegevens) -> dict:
+        """Stuur één bedien-actie naar de EMS en haal daarna meteen de nieuwe stand op.
+
+        Een geweigerde actie wordt een foutmelding in Home Assistant, met de reden die de
+        EMS geeft. Zonder die melding lijkt een schakelaar te reageren terwijl er niets is
+        gebeurd — en springt hij bij de volgende poll stilletjes terug.
+        """
+        try:
+            async with async_timeout.timeout(20):
+                resp = await self._session.post(self._bedien_url, headers=self._headers,
+                                                json={"action": actie, **gegevens})
+                if resp.status == 404:
+                    raise HomeAssistantError(
+                        "Deze EMS kan nog niet bediend worden vanuit Home Assistant "
+                        "(Soluna EMS 2.1.59 of nieuwer nodig)")
+                try:
+                    antwoord = await resp.json(content_type=None)
+                except ValueError:
+                    antwoord = {"ok": False, "error": f"onleesbaar antwoord (HTTP {resp.status})"}
+        except aiohttp.ClientError as err:
+            raise HomeAssistantError(f"Geen verbinding met de EMS: {err}") from err
+        except TimeoutError as err:
+            raise HomeAssistantError("De EMS reageerde niet binnen 20 seconden") from err
+        if resp.status == 401:
+            raise HomeAssistantError("Token geweigerd door de EMS")
+        if not (antwoord or {}).get("ok"):
+            reden = (antwoord or {}).get("error") or \
+                ((antwoord or {}).get("result") or {}).get("error") or f"HTTP {resp.status}"
+            raise HomeAssistantError(f"De EMS weigerde '{actie}': {reden}")
+        await self.async_request_refresh()
+        return antwoord
 
     def waarde(self, *pad, standaard=None):
         """Lees een geneste waarde, bv. waarde("power", "solar_w")."""

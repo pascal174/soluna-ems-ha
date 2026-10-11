@@ -24,7 +24,11 @@
     "step": {
       "init": {
         "title": "Instellingen",
-        "data": { "scan_interval": "Ophaalinterval (seconden)" }
+        "data": {
+          "scan_interval": "Ophaalinterval (seconden)",
+          "allow_control": "Bediening toestaan"
+        },
+        "description": "Met 'Bediening toestaan' komen er schakelaars, schuiven en keuzelijsten bij om de laadpaal, slim laden, overschot-laden, de regelmodus en de thuisaccu te bedienen. Ze lopen via dezelfde controles als het EMS-dashboard. De auto wordt nooit gewekt."
       }
     }
   }

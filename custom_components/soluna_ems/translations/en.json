@@ -24,7 +24,11 @@
     "step": {
       "init": {
         "title": "Settings",
-        "data": { "scan_interval": "Polling interval (seconds)" }
+        "data": {
+          "scan_interval": "Polling interval (seconds)",
+          "allow_control": "Allow control"
+        },
+        "description": "'Allow control' adds switches, sliders and selects to control the charger, smart charging, surplus charging, the control mode and the home battery. They go through the same checks as the EMS dashboard. The car is never woken."
       }
     }
   }
